@@ -1,16 +1,21 @@
-# This is a sample Python script.
+from Circuit.Circuit import Circuit
+from Circuit.Components import AND, OR
+from Circuit.Node import Node
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    and1 = AND()
+    and2 = AND()
+    or1 = OR()
+    in1 = Node()
+    in2 = Node()
+    in3 = Node()
+    in1.connect_to(and1.get_unconnected_input_node())
+    in2.connect_to(and1.get_unconnected_input_node())
+    in2.connect_to(or1.get_unconnected_input_node())
+    in3.connect_to(or1.get_unconnected_input_node())
+    and1.get_output_node().connect_to(and2.get_unconnected_input_node())
+    or1.get_output_node().connect_to(and2.get_unconnected_input_node())
+    circuit = Circuit()
+    circuit.add_input_node(in1)
+    circuit.add_input_node(in2)
+    circuit.add_input_node(in3)
