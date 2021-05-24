@@ -16,14 +16,29 @@ and_img     = cv2.medianBlur(and_img, 3)
 circuit_img = cv2.dilate(circuit_img, (7, 7), iterations=2)
 and_img     = cv2.dilate(and_img, (7, 7), iterations=2)
 
-circuit_img = cv2.Canny(circuit_img, 120, 170)
-and_img     = cv2.Canny(and_img, 120, 170)
+# circuit_img = cv2.Canny(circuit_img, 120, 170)
+# and_img     = cv2.Canny(and_img, 120, 170)
 
-contours, hir = cv2.findContours(and_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-for c in contours:
-  print(cv2.contourArea(c))
+contours_and, hir = cv2.findContours(and_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+contours_cir, hir = cv2.findContours(circuit_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-cv2.imshow("Main Circuit", circuit_img)
-cv2.imshow("And gate", and_img)
+matched = {}
+for c in contours_cir:
+  ret = cv2.matchShapes(c, contours_and[0], 1, 0.0)
+  matched[ret] = c
+
+for ret in matched:
+  c = matched[ret]
+  i = np.copy(circuit_img)
+  x,y,w,h = cv2.boundingRect(c)
+  cv2.rectangle(i,(x,y),(x+w,y+h),(255,255,255),2)
+  cv2.imshow(str(ret), i)
+
+# img = np.zeros_like(and_img)
+# cv2.drawContours(img, contours[1], -1, (255,255,255), -1)
+
+
+# cv2.imshow("And gate", and_img)
+# cv2.imshow("Count", img)
 
 cv2.waitKey(0)
