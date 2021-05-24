@@ -1,6 +1,7 @@
 from Circuit.Circuit import Circuit
 from Circuit.Components import AND, OR
 from Circuit.Node import Node
+from CodeGenerator.CodeGenerator import CodeGenerator
 
 if __name__ == '__main__':
     and1 = AND()
@@ -19,3 +20,5 @@ if __name__ == '__main__':
     circuit.add_input_node(in1)
     circuit.add_input_node(in2)
     circuit.add_input_node(in3)
+    codeGenerator = CodeGenerator(circuit)
+    codeGenerator.generate_verilog_file()

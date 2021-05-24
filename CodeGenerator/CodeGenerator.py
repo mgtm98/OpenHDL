@@ -19,7 +19,7 @@ class CodeGenerator:
     def get_verilog_code(self) -> str:
         return self.__verilogCode
 
-    def generate_verilog_file(self, path="", outFileName="out.txt") -> None:
+    def generate_verilog_file(self, path=os.getcwd(), outFileName="out.txt") -> None:
         f = open(os.path.join(path, outFileName), "w")
         f.write(self.get_verilog_code())
         f.close()
