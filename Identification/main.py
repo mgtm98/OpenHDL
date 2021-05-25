@@ -83,10 +83,6 @@ paintBucket = 255-paintBucket
 
 circuit_img = paintBucket + circuit_img
 
-# dilate paint bucket and subtract from original image or erode all image then dilate gates
-#bla bla
-#paintBucket = cv.dilate(paintBucket, (3,3) ,iterations=20)
-
 
 #detect connected components from paintbucket and draw big rectangles over them in circuit image
 # to be acurate rectangle dim = detected dimension + 2* edge -rect thickness (~ 30/2 pixel)  
@@ -106,12 +102,51 @@ for i in range (1, num_labels) :
                                           ,  (125,0,255) , thickness =2) 
   
 
+# dilate paint bucket and subtract from original image 
+
+custom_kernel2 = np.array([[1,1,1,0,0],
+                           [1,1,1,1,0],
+                           [1,1,1,1,1],
+                           [1,1,1,1,0],
+                           [1,1,1,0,0]] ,np.uint8 )
 
 
 
+#wires should ve the wires only
+
+#wires = total binary image && ~( dilated paintbucket)
+wires= circuit_img.copy()
+wires = cv.bitwise_and(cv.bitwise_not(
+                            cv.dilate(paintBucket.copy(),custom_kernel2, iterations=10) ), 
+                            wires )
+
+# some dots appear from previous op - > errosion
+
+wires = cv2.erode(wires, (5, 5) , iterations=7)
+
+# detecting wires
+
+
+
+num_labels, labels, stats, centroids = cv.connectedComponentsWithStats(wires)
+
+print(num_labels)
+for i in range (1, num_labels) : 
+
+    x = stats[i, cv2.CC_STAT_LEFT] - 15
+    y = stats[i, cv2.CC_STAT_TOP] - 15
+    w = stats[i, cv2.CC_STAT_WIDTH] + 30
+    h = stats[i, cv2.CC_STAT_HEIGHT] + 30
+
+  # drawing rectangles over gates 
+  #should add condition to reject wires beneath certain area (noise)
+    cv.rectangle (circuit_original_img , (x,y) , (x+w,y+h)
+                                          ,  (25,250,125) , thickness =2) 
+  
 
 #cv2.imshow("Count", and_img)
 cv.imshow("Circuit", circuit_img)
+cv.imshow("wires", wires)
 cv.imshow("filling", paintBucket)
 cv.imshow("gatesdetection", circuit_original_img)
 cv.waitKey(0)
