@@ -4,10 +4,16 @@ import numpy as np
 cv = cv2
 
 circuit_img = cv2.imread('./Images/test.jpg', 0)
+circuit_original_img = cv2.imread('./Images/test.jpg')
+
 and_img = cv2.imread('./Images/and.jpg', 0)
 
 circuit_img = cv2.resize(
     circuit_img, (circuit_img.shape[1]//2, circuit_img.shape[0]//2))
+
+circuit_original_img = cv2.resize(
+    circuit_original_img, (circuit_original_img.shape[1]//2, circuit_original_img.shape[0]//2 ))
+print(circuit_original_img.shape)
 and_img = cv2.resize(and_img, (and_img.shape[1]//2, and_img.shape[0]//2))
 '''
 circuit_img = cv2.adaptiveThreshold(
@@ -71,19 +77,42 @@ circuit_img = cv.dilate(circuit_img,custom_kernel1, iterations=3)
 
 paintBucket= circuit_img.copy()
 
-cv2.floodFill(paintBucket, None, seedPoint=(0,0), newVal=(255,255,255))
+cv.floodFill(paintBucket, None, seedPoint=(0,0), newVal=(255,255,255))
 
-circuit_img = 255- paintBucket + circuit_img
+paintBucket = 255-paintBucket
+
+circuit_img = paintBucket + circuit_img
+
+# dilate paint bucket and subtract from original image or erode all image then dilate gates
+#bla bla
+#paintBucket = cv.dilate(paintBucket, (3,3) ,iterations=20)
 
 
+#detect connected components from paintbucket and draw big rectangles over them in circuit image
+# to be acurate rectangle dim = detected dimension + 2* edge -rect thickness (~ 30/2 pixel)  
 
-#circuit_img = cv.Canny(circuit_img , 240 , 255 )
+
+num_labels, labels, stats, centroids = cv.connectedComponentsWithStats(paintBucket)
+
+for i in range (1, num_labels) : 
+
+    x = stats[i, cv2.CC_STAT_LEFT] - 15
+    y = stats[i, cv2.CC_STAT_TOP] - 15
+    w = stats[i, cv2.CC_STAT_WIDTH] + 30
+    h = stats[i, cv2.CC_STAT_HEIGHT] + 30
+
+  # drawing rectangles over gates 
+    cv.rectangle (circuit_original_img , (x,y) , (x+w,y+h)
+                                          ,  (125,0,255) , thickness =2) 
+  
+
 
 
 
 
 #cv2.imshow("Count", and_img)
-cv2.imshow("Circuit", circuit_img)
-cv2.imshow("filling", 255-paintBucket)
-cv2.waitKey(0)
+cv.imshow("Circuit", circuit_img)
+cv.imshow("filling", paintBucket)
+cv.imshow("gatesdetection", circuit_original_img)
+cv.waitKey(0)
 cv.destroyAllWindows()
