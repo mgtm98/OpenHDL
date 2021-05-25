@@ -1,5 +1,5 @@
 from Circuit.Circuit import Circuit
-from Circuit.Components import AND, OR
+from Circuit.Components import AND, OR, XOR
 from Circuit.Node import Node
 from CodeGenerator.CodeGenerator import CodeGenerator
 
