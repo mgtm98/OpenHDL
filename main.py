@@ -20,5 +20,6 @@ if __name__ == '__main__':
     circuit.add_input_node(in1)
     circuit.add_input_node(in2)
     circuit.add_input_node(in3)
+    circuit.add_output_node(and2.get_output_node())
     codeGenerator = CodeGenerator(circuit)
     codeGenerator.generate_verilog_file()
