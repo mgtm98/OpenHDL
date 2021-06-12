@@ -1,0 +1,26 @@
+<annotation>
+	<folder>Images</folder>
+	<filename>and.jpg</filename>
+	<path>C:\Users\mgtmP\Desktop\4th\Image\OpenHDL\Identification\Images\and.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>960</width>
+		<height>487</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>and</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>416</xmin>
+			<ymin>254</ymin>
+			<xmax>562</xmax>
+			<ymax>420</ymax>
+		</bndbox>
+	</object>
+</annotation>
