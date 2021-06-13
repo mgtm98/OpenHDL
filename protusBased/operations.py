@@ -47,6 +47,9 @@ def draw_contour(img, c, color=WHITE, pen=2, fill=False):
     if fill: pen = -1
     cv2.rectangle(img, (x, y), (x + w, y + h), color, pen)
 
+def get_bounding_box(c):
+    return cv2.boundingRect(c)
+
 def convert_to_grey(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -101,8 +104,9 @@ def __search(img, test, point, dx, dy):
 
 def get_connected_nodes(img, corners):
     test = np.zeros_like(img)
-    f_out = []
-    for corner in corners:
+    f_out = {}
+    for i in range(len(corners)):
+        corner = corners[i]
         draw_cir(test, corner, 3, color=WHITE, fill=True)
         # cv2.imshow("test", test)
         # cv2.waitKey()
@@ -115,8 +119,14 @@ def get_connected_nodes(img, corners):
             if len(out) == 0: terminals.append(p)
             if len(stack) == 0: break
         # print("line finished", terminals)
-        if len(terminals) > 1: f_out.append(terminals)
+        if len(terminals) > 1: f_out["N"+str(i)] = {"terminals": terminals}
     return f_out
+
+def check_point_in_rec(p, search_box):
+    return search_box[0] <= p[0] <= search_box[0]+search_box[2] and search_box[1] <= p[1] <= search_box[1] + search_box[3]
+
+def add_text(img, text, point, color=RANDOM_COLOR(), pen=2):
+    return cv2.putText(img, text, point, cv2.FONT_HERSHEY_SIMPLEX, 1, color, pen, cv2.LINE_AA)
 
 get_contour_area = cv2.contourArea
 

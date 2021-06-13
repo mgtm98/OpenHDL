@@ -24,7 +24,7 @@ def get_gate_type(cont):
     and_score = get_cont_similarity(cont, get_and_ref())
     or_score = get_cont_similarity(cont, get_or_ref())
     not_score = get_cont_similarity(cont, get_not_ref())
-    print(and_score, or_score, not_score)
+    # print(and_score, or_score, not_score)
     min_score = min(and_score, or_score, not_score)
     if min_score > 0.1: return "NOT"
     if min_score == and_score: return "AND"
