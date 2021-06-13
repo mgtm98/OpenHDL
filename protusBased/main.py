@@ -1,28 +1,26 @@
 import cv2
 from operations import *
-from ref import get_and_ref, get_gate_type, get_or_ref
+from ref import get_gate_type
 import numpy as np
 
-img = cv2.imread("images/test_cir2_x3.PNG")
-grey_img = convert_to_grey(img)
-thresh = get_thershold(grey_img)
+img = cv2.imread("images/test_cir2_x3.PNG")               # load the circuit colored image 
+grey_img = convert_to_grey(img)                           # convert image to grey scale
+thresh = get_thershold(grey_img)                          # convert it to binary image
 
-gates = copy(thresh)
-wires = copy(thresh)
+gates = copy(thresh)                                      # we will fill the gates in this image
+wires = copy(thresh)                                      # we will operate on wires in this image
 
-fill(gates)
-wires = cv2.bitwise_or(cv2.bitwise_not(gates), wires)
-t = copy(wires)
+fill(gates)                                               # fill the gates to get the contours arround them
+
+wires = cv2.bitwise_or(cv2.bitwise_not(gates), wires)     # the binary image with the gates filled
+t = copy(wires)                                           # temp image of binary image with gate filled
 wires = erode(wires, (5,5))
 wires = dilate(wires, (5,5))
-wires = t - wires
-wires = erode(wires, (3, 3))
+wires = t - wires                                         # get the wires only with some noise
+wires = erode(wires, (3, 3))                              # remove the noise
 wires = dilate(wires, (3, 3))
 
-borders = get_edges(gates)
-img_cont = reduce_cont(get_contours(borders))
-print("img", len(img_cont))
-
+# remove further noise in the wires by detecting the low area contours which resembles the noise
 wires_cont = get_contours(wires)
 print("wires", len(wires_cont))
 wires_cont_filter = []
@@ -30,31 +28,29 @@ for c in wires_cont:
     if get_contour_area(c) < 50: draw_contour(wires, c, color=BLACK, fill=True)
 wires = erode(wires, (3, 3))
 
+borders = get_edges(gates)                                # get the borders of the filled gates image
+img_cont = reduce_cont(get_contours(borders))             # extract the contours to operate arround them
+print("Number of contours for gates", len(img_cont))      # display number of contours (for debuging) 
+
+# get the type of the gate based on comparing contours
 for c in img_cont:
     gate_type = get_gate_type(c)
     if gate_type == "AND": draw_contour(img, c, color=RED)
     elif gate_type == "OR": draw_contour(img, c, color=BLUE)
     elif gate_type == "NOT": draw_contour(img, c, color=GRENN)
-    elif gate_type == "XOR": draw_contour(img, c, color=MAGENTA)
     else: draw_contour(img, c, color=BLACK)
 
-blank = np.zeros_like(wires)
 
-num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(wires, cv2.CV_32S)
-for a in range(1, num_labels):
-  x = stats[a, cv2.CC_STAT_LEFT]
-  y = stats[a, cv2.CC_STAT_TOP]
-  w = stats[a, cv2.CC_STAT_WIDTH]
-  h = stats[a, cv2.CC_STAT_HEIGHT]
-  draw_rec(blank, x, y, w, h, WHITE)
+# get the connected nodes
+nodes = get_connected_nodes(wires, get_corners(wires))    # get the corners in the wires
+for node in nodes:                                        # used the corner pointts to detect the connected nodes
+    c = RANDOM_COLOR()
+    for p in node:
+        draw_cir(img, p, 10, c, True)
 
-blank = cv2.bitwise_and(blank, wires)
 
 cv2.imshow("gates", gates)
 cv2.imshow("thresh", thresh)
 cv2.imshow("bord", borders)
 cv2.imshow("img", img)
-cv2.imshow("blank", blank)
-cv2.imshow("wires", wires)
-
-cv2.waitKey()
+cv2.waitKey() 
