@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 BLUE = (255, 0, 0)
 GRENN = (0, 255, 0)
@@ -38,8 +39,9 @@ def reduce_cont(contours):
             h_list.append(h)
     return out
     
-def draw_contour(img, c, color=WHITE, pen=2):
+def draw_contour(img, c, color=WHITE, pen=2, fill=False):
     x,y,w,h = cv2.boundingRect(c)
+    if fill: pen = -1
     cv2.rectangle(img, (x, y), (x + w, y + h), color, pen)
 
 def convert_to_grey(img):
@@ -47,6 +49,20 @@ def convert_to_grey(img):
 
 def get_cont_similarity(cont, ref_cont):
     return cv2.matchShapes(cont, ref_cont, 1, 0.0)
+
+def copy(img):
+    return img.copy()
+
+def dilate(img, kernel):
+    kernel = np.ones(kernel)
+    return cv2.dilate(img, kernel)
+
+def erode(img, kernel):
+    kernel = np.ones(kernel)
+    return cv2.erode(img, kernel)
+
+def draw_rec(img, x, y, w, h, color):
+    cv2.rectangle(img, (x, y), (x+w, y+h), color)
 
 get_contour_area = cv2.contourArea
 
