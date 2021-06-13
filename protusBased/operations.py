@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from itertools import product
 from random import randint
+import math
 
 BLUE = (255, 0, 0)
 GRENN = (0, 255, 0)
@@ -99,6 +100,7 @@ def __search(img, test, point, dx, dy):
           draw_cir(test, p, 3, color=WHITE, fill=True)
           draw_cir(img, p, 3, color=BLACK, fill=True)    
           # cv2.imshow("test", test)
+          # cv2.imshow("img", img)
           # cv2.waitKey()
     return out
 
@@ -113,6 +115,7 @@ def get_connected_nodes(img, corners):
         stack = [corner]
         terminals = []
         while True:
+            # print("stack", stack)
             p = stack.pop()
             out = __search(img, test, p, 4, 4)
             stack += out
@@ -121,6 +124,39 @@ def get_connected_nodes(img, corners):
         # print("line finished", terminals)
         if len(terminals) > 1: f_out["N"+str(i)] = {"terminals": terminals}
     return f_out
+
+def reduce_nodes(nodes):
+    points = []
+    for n in nodes:
+        for t in nodes[n]["terminals"]:
+            points.append([t, n])
+    for p1 in points:
+        for p2 in points:
+            if p1 == p2: continue
+            else: 
+                distance = math.sqrt((p1[0][0] - p2[0][0])**2 + (p1[0][1] - p2[0][1])**2)
+                # print(distance)
+                if distance < 20:
+                    print("added")
+                    p1.append(p2[1])
+    i = 0
+    node_map = {}
+    for p in points:
+        if len(p) > 2:
+            for j in range(1, len(p)):
+                if p[j] not in node_map:
+                    node_map[p[j]] = "J"+str(i)
+            i += 1
+    out = {}
+    for p in points:
+      if p[1] in node_map:
+          if node_map[p[1]] not in out: out[node_map[p[1]]] = {"terminals": []}
+          out[node_map[p[1]]]["terminals"].append(p[0])
+      else:
+          if p[1] not in out: out[p[1]] = {"terminals": []}
+          out[p[1]]["terminals"].append(p[0])
+    return out
+    
 
 def check_point_in_rec(p, search_box):
     return search_box[0] <= p[0] <= search_box[0]+search_box[2] and search_box[1] <= p[1] <= search_box[1] + search_box[3]

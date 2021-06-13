@@ -2,8 +2,9 @@ import cv2
 from operations import *
 from ref import get_gate_type
 import numpy as np
+import pprint
 
-img = cv2.imread("images/test_cir2_x3.PNG")               # load the circuit colored image 
+img = cv2.imread("images/test_cir4_x3.PNG")               # load the circuit colored image 
 grey_img = convert_to_grey(img)                           # convert image to grey scale
 thresh = get_thershold(grey_img)                          # convert it to binary image
 
@@ -12,10 +13,10 @@ wires = copy(thresh)                                      # we will operate on w
 
 fill(gates)                                               # fill the gates to get the contours arround them
 
-wires = cv2.bitwise_or(cv2.bitwise_not(gates), wires)     # the binary image with the gates filled
+wires = cv2.bitwise_or(cv2.bitwise_not(gates), wires)     # the binary image with the gates filled()
 t = copy(wires)                                           # temp image of binary image with gate filled
-wires = erode(wires, (5,5))
-wires = dilate(wires, (5,5))
+wires = erode(wires, (5, 5))
+wires = dilate(wires, (5, 5))
 wires = t - wires                                         # get the wires only with some noise
 wires = erode(wires, (3, 3))                              # remove the noise
 wires = dilate(wires, (3, 3))
@@ -50,15 +51,19 @@ for i in range(len(img_cont)):
     elif gate_type == "NOT": draw_contour(img, c, color=GRENN)
     else: draw_contour(img, c, color=BLACK)
 
+print("gates_meta_data", gates_meta_data)
 
 # get the connected nodes
 nodes = get_connected_nodes(wires, get_corners(wires))    # get the corners in the wires
+nodes = reduce_nodes(nodes)
+
 for node_name in nodes:
     terminals = nodes[node_name]["terminals"]             # used the corner pointts to detect the connected nodes
     c = RANDOM_COLOR()
     for p in terminals:
         draw_cir(img, p, 10, c, True)
     img = add_text(img, node_name, terminals[0], c)
+
 
 for gate in gates_meta_data:
     box = gates_meta_data[gate]["box"]
@@ -70,10 +75,12 @@ for gate in gates_meta_data:
         for p in terminals:
             if check_point_in_rec(p, search_box): nodes[node_name]["gate_connected"].append(gate)
 
-print(nodes)
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(nodes)
 
-cv2.imshow("gates", gates)
-cv2.imshow("thresh", thresh)
-cv2.imshow("bord", borders)
+
+# cv2.imshow("gates", gates)
+# cv2.imshow("thresh", thresh)
+# cv2.imshow("bord", borders)
 cv2.imshow("img", img)
 cv2.waitKey() 
