@@ -4,7 +4,7 @@ from ref import get_gate_type
 import numpy as np
 import pprint
 
-img = cv2.imread("images/test_cir4_x3.PNG")               # load the circuit colored image 
+img = cv2.imread("images/test_cir3_x3.PNG")               # load the circuit colored image 
 grey_img = convert_to_grey(img)                           # convert image to grey scale
 thresh = get_thershold(grey_img)                          # convert it to binary image
 
@@ -52,7 +52,7 @@ for i in range(len(img_cont)):
     else: draw_contour(img, c, color=BLACK)
 
 print("gates_meta_data", gates_meta_data)
-
+print("print", p)
 # get the connected nodes
 nodes = get_connected_nodes(wires, get_corners(wires))    # get the corners in the wires
 nodes = reduce_nodes(nodes)
@@ -78,6 +78,25 @@ for gate in gates_meta_data:
 pp = pprint.PrettyPrinter(indent=4)
 pp.pprint(nodes)
 
+
+gates_names = list(gates_meta_data.keys())
+gates_to_wires = {i: [] for i in gates_names}
+for gate in gates_names:    #['AND0', 'AND1', 'OR1', 'NOT2']
+    for wire in nodes.keys():
+        if gate in nodes[wire]['gate_connected']:
+            gates_to_wires[gate].append(wire)
+pp.pprint(gates_to_wires)
+
+for gate in gates_to_wires.keys():
+    x1, y1, w, h = gates_meta_data[gate]['box']
+    x2, y2 = x1+w, y1+h
+    points = []
+    for wire in gates_to_wires[gate]:
+        for point in nodes[wire]['terminals']:
+            if abs(x1 - point[0])<=3:
+                points.append((wire, x1))
+            elif abs(x2 - point[0]):                         # let it be "if", if we support loops
+                points.append((wire, x2))
 
 # cv2.imshow("gates", gates)
 # cv2.imshow("thresh", thresh)
