@@ -1,4 +1,4 @@
-from operations import *
+from .operations import *
 import cv2
 
 AND_PATH = "images/and_x3.PNG"

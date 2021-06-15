@@ -125,6 +125,9 @@ def get_connected_nodes(img, corners):
         if len(terminals) > 1: f_out["N"+str(i)] = {"terminals": terminals}
     return f_out
 
+def get_distance_between_points(p1, p2):
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+
 def reduce_nodes(nodes):
     points = []
     for n in nodes:
@@ -134,10 +137,10 @@ def reduce_nodes(nodes):
         for p2 in points:
             if p1 == p2: continue
             else: 
-                distance = math.sqrt((p1[0][0] - p2[0][0])**2 + (p1[0][1] - p2[0][1])**2)
+                distance = get_distance_between_points(p1[0], p2[0])
                 # print(distance)
                 if distance < 20:
-                    print("added")
+                    # print("added")
                     p1.append(p2[1])
     i = 0
     node_map = {}
@@ -156,7 +159,9 @@ def reduce_nodes(nodes):
           if p[1] not in out: out[p[1]] = {"terminals": []}
           out[p[1]]["terminals"].append(p[0])
     return out
-    
+
+def blur(img, size):
+    return cv2.GaussianBlur(img, (size, size), cv2.BORDER_DEFAULT)    
 
 def check_point_in_rec(p, search_box):
     return search_box[0] <= p[0] <= search_box[0]+search_box[2] and search_box[1] <= p[1] <= search_box[1] + search_box[3]
