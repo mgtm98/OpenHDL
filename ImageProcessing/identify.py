@@ -158,6 +158,7 @@ def extract_circuit(path):
                       "output": gate_to_node[1][0],
                   }
     # pp.pprint(objects_in_criecuit)
+    cv2.imwrite("out.png", img)
     return objects_in_criecuit
     
 
