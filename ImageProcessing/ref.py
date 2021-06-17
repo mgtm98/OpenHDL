@@ -17,8 +17,13 @@ def get_ref_contour(path):
 
 
 def get_and_ref(): return get_ref_contour(AND_PATH)
+
+
 def get_or_ref(): return get_ref_contour(OR_PATH)
+
+
 def get_not_ref(): return get_ref_contour(NOT_PATH)
+
 
 def get_gate_type(cont):
     and_score = get_cont_similarity(cont, get_and_ref())
@@ -27,6 +32,9 @@ def get_gate_type(cont):
     # print(and_score, or_score, not_score)
     min_score = min(and_score, or_score, not_score)
     if min_score > 0.1: return "NOT"
-    if min_score == and_score: return "AND"
-    elif min_score == or_score: return "OR"
-    elif min_score == not_score: return "NOT"
+    if min_score == and_score:
+        return "AND"
+    elif min_score == or_score:
+        return "OR"
+    elif min_score == not_score:
+        return "NOT"

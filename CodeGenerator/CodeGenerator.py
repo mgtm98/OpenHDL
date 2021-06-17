@@ -1,7 +1,7 @@
 import os
 
 from Circuit.Circuit import Circuit
-from Circuit.Components import AND, OR, XOR
+from Circuit.Components import AND, OR, XOR, NOT
 
 
 class CodeGenerator:
@@ -23,7 +23,7 @@ class CodeGenerator:
         self.__circuit: Circuit = circuit
         self.__inputNodes = circuit.get_input_nodes()
         self.__circuitNodes = []
-        self.__outputNodes = circuit.get_output_nodes()
+        self.__outputNodes = []
         self.__verilogCode = ""
         self.__mapNodesToNames = {}
         self.__name_nodes()
@@ -33,7 +33,7 @@ class CodeGenerator:
         self.__circuit = circuit
         self.__inputNodes = circuit.get_input_nodes()
         self.__circuitNodes = []
-        self.__outputNodes = circuit.get_output_nodes()
+        self.__outputNodes = []
         self.__verilogCode = ""
         self.__mapNodesToNames = {}
         self.__name_nodes()
@@ -51,6 +51,8 @@ class CodeGenerator:
             self.__mapNodesToNames[node] = CodeGenerator.__get_node_name()
             if node not in self.__inputNodes:
                 self.__circuitNodes.append(node)
+            if len(node.get_connected_to_nodes()) == 0:
+                self.__outputNodes.append(node)
             for connectedNode in node.get_connected_to_nodes():
                 nodes.append(connectedNode.get_component().get_output_node())
 
@@ -81,25 +83,29 @@ class CodeGenerator:
         for circuitNode in self.__circuitNodes:
             component = circuitNode.get_component()
             if isinstance(component, AND):
-                verilogCode += "\tassign {} = ".format(self.__mapNodesToNames[circuitNode])
+                verilogCode += "\tassign {} = ".format(self.__mapNodesToNames[component.get_output_node()])
                 for inputNode in component.get_input_nodes():
                     previousOutputNode = inputNode.get_connected_from_node()
                     verilogCode += "{} & ".format(self.__mapNodesToNames[previousOutputNode])
                 verilogCode = verilogCode[:-3] + ";\n"
             elif isinstance(component, OR):
-                verilogCode += "\tassign {} = ".format(self.__mapNodesToNames[circuitNode])
+                verilogCode += "\tassign {} = ".format(self.__mapNodesToNames[component.get_output_node()])
                 for inputNode in component.get_input_nodes():
                     previousOutputNode = inputNode.get_connected_from_node()
                     verilogCode += "{} | ".format(self.__mapNodesToNames[previousOutputNode])
                 verilogCode = verilogCode[:-3] + ";\n"
             elif isinstance(component, XOR):
-                verilogCode += "\tassign {} = ".format(self.__mapNodesToNames[circuitNode])
+                verilogCode += "\tassign {} = ".format(self.__mapNodesToNames[component.get_output_node()])
                 for inputNode in component.get_input_nodes():
                     previousOutputNode = inputNode.get_connected_from_node()
                     verilogCode += "{} ^ ".format(self.__mapNodesToNames[previousOutputNode])
                 verilogCode = verilogCode[:-3] + ";\n"
+            elif isinstance(component, NOT):
+                inputNode = component.get_input_node()
+                previousOutputNode = inputNode.get_connected_from_node()
+                verilogCode += "\tassign {} = ~{}".format(self.__mapNodesToNames[component.get_output_node()],
+                                                          self.__mapNodesToNames[previousOutputNode])
         verilogCode += "\n"
-        # Add the end of the module
         verilogCode += "endmodule"
         self.__verilogCode = verilogCode
 
