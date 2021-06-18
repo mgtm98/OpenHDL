@@ -17,6 +17,9 @@ def get_thershold(img, upper_limit=255, lower_limit=127, type=cv2.THRESH_BINARY_
     _, t = cv2.threshold(img, lower_limit, upper_limit, type)
     return t
 
+def get_adaptive_threshold(img):
+    return cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,7,2)
+
 
 def fill(img):
     cv2.floodFill(img, None, seedPoint=(0, 0), newVal=(255, 255, 255))
@@ -197,3 +200,5 @@ def add_text(img, text, point, color=RANDOM_COLOR(), pen=2):
 
 
 get_contour_area = cv2.contourArea
+show = cv2.imshow
+wait = cv2.waitKey

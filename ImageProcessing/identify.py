@@ -7,8 +7,8 @@ import pprint
 import os
 
 pp = pprint.PrettyPrinter(indent=4)
-show = cv2.imshow
-wait = cv2.waitKey
+show = lambda x, y: 1+1
+wait = lambda: 1 + 1
 
 
 def extract_circuit(path):

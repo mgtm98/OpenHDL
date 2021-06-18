@@ -1,9 +1,9 @@
 from .operations import *
 import cv2
 
-AND_PATH = "images/and_x3.PNG"
-OR_PATH = "images/or_x3.PNG"
-NOT_PATH = "images/not_x3.PNG"
+AND_PATH = "C:\\Users\\mgtmP\\Desktop\\4th\\Image\\OpenHDL\\ImageProcessing\\images\\and_x3.PNG"
+OR_PATH = "C:\\Users\\mgtmP\\Desktop\\4th\\Image\\OpenHDL\\ImageProcessing\\images\\or_x3.PNG"
+NOT_PATH = "C:\\Users\\mgtmP\\Desktop\\4th\\Image\\OpenHDL\\ImageProcessing\\images\\not_x3.PNG"
 
 
 def get_ref_contour(path):
