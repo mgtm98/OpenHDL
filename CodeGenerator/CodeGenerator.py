@@ -103,7 +103,7 @@ class CodeGenerator:
             elif isinstance(component, NOT):
                 inputNode = component.get_input_node()
                 previousOutputNode = inputNode.get_connected_from_node()
-                verilogCode += "\tassign {} = ~{}".format(self.__mapNodesToNames[component.get_output_node()],
+                verilogCode += "\tassign {} = ~{};".format(self.__mapNodesToNames[component.get_output_node()],
                                                           self.__mapNodesToNames[previousOutputNode])
         verilogCode += "\n"
         verilogCode += "endmodule"
